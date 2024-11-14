@@ -18,7 +18,7 @@
             }
         }
 
-        public function cadastroUsuario($nome, $telefone, $email, $senha)
+        public function cadastroUsuario($nome, $email, $telefone, $senha)
         {
             global $pdo;
 
@@ -36,9 +36,29 @@
                 $sql->bindValue(":n",$nome);
                 $sql->bindValue(":e",$email);
                 $sql->bindValue(":t",$telefone);
-                $sql->bindValue(":s",$senha);
+                $sql->bindValue(":s",md5($senha));
                 $sql->execute();
                 return true;
+            }
+        }
+
+        public function logar($email, $senha)
+        {
+            global $pdo;
+            $verificarEmailSenha = $pdo->prepare("SELECT id_usuario FROM usuario WHERE email = :e AND senha = :s");
+            $verificarEmailSenha->bindValue(":e", $email);
+            $verificarEmailSenha->bindValue(":s", md5($senha));
+            $verificarEmailSenha->execute();
+
+            if($verificarEmailSenha->rowCount()>0)
+            {
+                $dados = $verificarEmailSenha->fetch();
+                session_start();
+                $_SESSION['id_usuario'] = $dados['id_dados'];
+                return true;
+            }
+            else{
+                return false;
             }
         }
     }
