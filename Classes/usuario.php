@@ -76,5 +76,38 @@
                 return false;
             }
         }
+        public function atualizar($id_usuario, $nome, $email, $telefone, $senha)
+        {
+            global $pdo;
+            $sql = $pdo->prepare("SELECT id_usuario FROM usuario WHERE email = :e AND id_usuario != :id");
+            $sql->bindValue(":e", $email);
+            $sql->bindValue(":id", $id_usuario);
+            $sql->execute();
+
+            if($sql->rowCount()>0)
+            {
+                return false;
+            }
+            else
+            {
+                $sql = $pdo->prepare("UPDATE usuario SET nome= :n, telefone = :t, email = :e, senha = :s WHERE id_usuario =:id");
+                $sql->bindValue(":n", $nome);
+                $sql->bindValue(":e", $email);
+                $sql->bindValue(":t", $telefone);
+                $sql->bindValue(":s", md5($senha));
+                $sql->bindValue(":id", $id_usuario);
+                $sql->execute();
+                return true;
+            }
+        }
+
+        public function deletar(int $id_usuario)
+        {
+            global $pdo;
+            $sql = $pdo->prepare("DELETE FROM usuario WHERE id_usuario = :id");
+            $sql->bindValue(":id", $id_usuario);
+            $sql->execute();
+            
+        }
     }
 ?>
